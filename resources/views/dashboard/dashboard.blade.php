@@ -7,7 +7,7 @@
                 <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded">
             </div>
             <div id="user-info">
-                <h2 id="user-name">Adam Abdi Al A'la</h2>
+                <h2 id="user-name">Reza</h2>
                 <span id="user-role">Head of IT</span>
             </div>
         </div>
@@ -69,11 +69,20 @@
                         <div class="card-body">
                             <div class="presencecontent">
                                 <div class="iconpresence">
-                                    <ion-icon name="camera"></ion-icon>
+                                    @if ($todayAttendance != null)
+                                        @php
+                                            $path = Storage::url(
+                                                'public/uploads/attendance/' . $todayAttendance->check_in_photo,
+                                            );
+                                        @endphp
+                                        <img src="{{ $path }}" alt="image" class="imaged w64">
+                                    @else
+                                        <ion-icon name="camera"></ion-icon>
+                                    @endif
                                 </div>
                                 <div class="presencedetail">
                                     <h4 class="presencetitle">Masuk</h4>
-                                    <span>07:00</span>
+                                    <span>{{ $todayAttendance != null ? $todayAttendance->check_in_time : 'Belum Melakukan Presensi Masuk' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -84,11 +93,20 @@
                         <div class="card-body">
                             <div class="presencecontent">
                                 <div class="iconpresence">
-                                    <ion-icon name="camera"></ion-icon>
+                                    @if ($todayAttendance != null && $todayAttendance->check_out_photo != null)
+                                        @php
+                                            $path = Storage::url(
+                                                'public/uploads/attendance/' . $todayAttendance->check_out_photo,
+                                            );
+                                        @endphp
+                                        <img src="{{ $path }}" alt="image" class="imaged w64">
+                                    @else
+                                        <ion-icon name="camera"></ion-icon>
+                                    @endif
                                 </div>
                                 <div class="presencedetail">
                                     <h4 class="presencetitle">Pulang</h4>
-                                    <span>12:00</span>
+                                    <span>{{ $todayAttendance != null && $todayAttendance->check_out_time != null ? $todayAttendance->check_out_time : 'Belum Melakukan Presensi Pulang' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -97,73 +115,7 @@
             </div>
         </div>
 
-        <div class="rekappresence">
-            <div id="chartdiv"></div>
-            <!-- <div class="row">
-                                                        <div class="col-6">
-                                                            <div class="card">
-                                                                <div class="card-body">
-                                                                    <div class="presencecontent">
-                                                                        <div class="iconpresence primary">
-                                                                            <ion-icon name="log-in"></ion-icon>
-                                                                        </div>
-                                                                        <div class="presencedetail">
-                                                                            <h4 class="rekappresencetitle">Hadir</h4>
-                                                                            <span class="rekappresencedetail">0 Hari</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="card">
-                                                                <div class="card-body">
-                                                                    <div class="presencecontent">
-                                                                        <div class="iconpresence green">
-                                                                            <ion-icon name="document-text"></ion-icon>
-                                                                        </div>
-                                                                        <div class="presencedetail">
-                                                                            <h4 class="rekappresencetitle">Izin</h4>
-                                                                            <span class="rekappresencedetail">0 Hari</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mt-1">
-                                                        <div class="col-6">
-                                                            <div class="card">
-                                                                <div class="card-body">
-                                                                    <div class="presencecontent">
-                                                                        <div class="iconpresence warning">
-                                                                            <ion-icon name="sad"></ion-icon>
-                                                                        </div>
-                                                                        <div class="presencedetail">
-                                                                            <h4 class="rekappresencetitle">Sakit</h4>
-                                                                            <span class="rekappresencedetail">0 Hari</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <div class="card">
-                                                                <div class="card-body">
-                                                                    <div class="presencecontent">
-                                                                        <div class="iconpresence danger">
-                                                                            <ion-icon name="alarm"></ion-icon>
-                                                                        </div>
-                                                                        <div class="presencedetail">
-                                                                            <h4 class="rekappresencetitle">Terlambat</h4>
-                                                                            <span class="rekappresencedetail">0 Hari</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div> -->
-        </div>
+
         <div class="presencetab mt-2">
             <div class="tab-pane fade show active" id="pilled" role="tabpanel">
                 <ul class="nav nav-tabs style1" role="tablist">
@@ -182,41 +134,39 @@
             <div class="tab-content mt-2" style="margin-bottom:100px;">
                 <div class="tab-pane fade show active" id="home" role="tabpanel">
                     <ul class="listview image-listview">
-                        <li>
-                            <div class="item">
-                                <div class="icon-box bg-primary">
-                                    <ion-icon name="image-outline" role="img" class="md hydrated"
-                                        aria-label="image outline"></ion-icon>
+                        @foreach ($historyMonth as $d)
+                            @php
+                                $path = Storage::url('public/uploads/attendance/' . $d->check_in_photo);
+                            @endphp
+                            <li>
+                                <div class="item">
+                                    <div class="icon-box bg-primary">
+                                        <ion-icon name="finger-print-outline"></ion-icon>
+                                    </div>
+                                    <div class="in">
+                                        <div>{{ date('d M Y') }} </div>
+                                        <span class="badge badge-success square ">{{ $d->check_in_time }}</span>
+                                        <td style="width: 100%; max-width: 100%; white-space: normal;">
+                                            <span class="badge badge-danger"
+                                                style="
+                                                white-space: normal;
+                                                word-break: break-word;
+                                                display: inline-block;
+                                                width: 100%;
+                                            ">
+                                                {{ $todayAttendance != null && $todayAttendance->check_out_time != null
+                                                    ? $todayAttendance->check_out_time
+                                                    : 'Belum Melakukan Presensi' }}
+                                            </span>
+                                        </td>
+
+
+                                    </div>
                                 </div>
-                                <div class="in">
-                                    <div>Photos</div>
-                                    <span class="badge badge-danger">10</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="item">
-                                <div class="icon-box bg-secondary">
-                                    <ion-icon name="videocam-outline" role="img" class="md hydrated"
-                                        aria-label="videocam outline"></ion-icon>
-                                </div>
-                                <div class="in">
-                                    <div>Videos</div>
-                                    <span class="text-muted">None</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="item">
-                                <div class="icon-box bg-danger">
-                                    <ion-icon name="musical-notes-outline" role="img" class="md hydrated"
-                                        aria-label="musical notes outline"></ion-icon>
-                                </div>
-                                <div class="in">
-                                    <div>Music</div>
-                                </div>
-                            </div>
-                        </li>
+                            </li>
+                        @endforeach
+
+
                     </ul>
                 </div>
                 <div class="tab-pane fade" id="profile" role="tabpanel">

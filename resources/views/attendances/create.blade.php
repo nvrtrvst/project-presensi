@@ -68,12 +68,16 @@
     <audio id="notification_out">
         <source src="{{ asset('assets/sound/presensi-pulang.mp3') }}" type="audio/mpeg">
     </audio>
+    <audio id="radius_notification">
+        <source src="{{ asset('assets/sound/radius.mp3') }}" type="audio/mpeg">
+    </audio>
 @endsection
 
 @push('script')
     <script>
         var notification_in = document.getElementById('notification_in');
         var notification_out = document.getElementById('notification_out');
+        var radius_notification = document.getElementById('radius_notification');
         Webcam.set({
             width: 480,
             height: 640,
@@ -97,7 +101,7 @@
             }).addTo(map);
             var marker = L.marker([position.coords.latitude, position.coords.longitude]).addTo(
                 map); // L.marker([51.5, -0.09]).addTo(map);
-            var circle = L.circle([position.coords.latitude, position.coords.longitude], {
+            var circle = L.circle([-6.914744, 107.609810], {
                 color: 'red',
                 fillColor: '#f03',
                 fillOpacity: 0.5,
@@ -138,6 +142,9 @@
                         });
                         setTimeout("location.href='/dashboard'", 3000);
                     } else {
+                        if (status[2] == 'radius') {
+                            radius_notification.play();
+                        }
                         Swal.fire({
                             title: 'Error!',
                             text: status[1],
