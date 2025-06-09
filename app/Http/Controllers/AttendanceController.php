@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 
 class AttendanceController extends Controller
@@ -87,18 +88,80 @@ class AttendanceController extends Controller
         }
 
 
-        //hitung jarak presensi
-        function distance($lat1, $lon1, $lat2, $lon2) {
-            $theta = $lon1 - $lon2;
-            $miles = (sin(deg2rad($lat1)) * sin(deg2rad($lat2))) + (cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta)));
-            $miles = acos($miles);
-            $miles = rad2deg($miles);
-            $miles = $miles * 60 * 1.1515;
-            $feet = $miles * 5280;
-            $yards = $feet / 3;
-            $kilometers = $miles * 1.609344;
-            $meters = $kilometers * 1000;
-            return compact('meters');
-        }
+    public function distance($lat1, $lon1, $lat2, $lon2) {
+    //hitung jarak presensi
+    $theta = $lon1 - $lon2;
+    $miles = (sin(deg2rad($lat1)) * sin(deg2rad($lat2))) + (cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta)));
+        $miles = acos($miles);
+        $miles = rad2deg($miles);
+        $miles = $miles * 60 * 1.1515;
+        $feet = $miles * 5280;
+        $yards = $feet / 3;
+        $kilometers = $miles * 1.609344;
+        $meters = $kilometers * 1000;
+        return compact('meters');
     }
+
+
+        public function editProfile()
+        {
+            $nik = Auth::guard('employee')->user()->nik;
+            $employee = DB::table('employees')->where('nik', $nik)->first();
+            return view('/attendances/editProfile', compact('employee'));
+        }
+
+
+        public function updateProfile(Request $request)
+        {
+            $nik = Auth::guard('employee')->user()->nik;
+
+            // Validasi input
+            $request->validate([
+                'nama_lengkap' => 'nullable|string|max:255',
+                'no_hp' => 'nullable|string|max:20',
+                'password' => 'nullable|string|min:6',
+                'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
+            $data = [];
+
+            if ($request->filled('nama_lengkap')) {
+                $data['fullname'] = $request->nama_lengkap;
+            }
+
+            if ($request->filled('no_hp')) {
+                $data['phone'] = $request->no_hp;
+            }
+
+            if ($request->filled('password')) {
+                $data['password'] = bcrypt($request->password);
+            }
+
+            if ($request->hasFile('foto')) {
+                $fotoName = $nik . '.' . $request->file('foto')->getClientOriginalExtension();
+
+                // Simpan file ke storage/app/public/uploads/employee
+                Storage::disk('public')->putFileAs('uploads/employee', $request->file('foto'), $fotoName);
+
+                // Simpan path relatif (tanpa storage/) ke DB
+                $data['photo'] = 'uploads/employee/' . $fotoName;
+            }
+
+            if (!empty($data)) {
+                $updated = DB::table('employees')->where('nik', $nik)->update($data);
+                return redirect()->back()->with(
+                    $updated ? 'success' : 'warning',
+                    $updated ? 'Profil berhasil diperbarui.' : 'Tidak ada perubahan data.'
+                );
+            }
+
+            return redirect()->back()->with('warning', 'Tidak ada data yang diubah.');
+        }
+
+
+
+
+
+}
+
 

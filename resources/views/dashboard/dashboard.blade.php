@@ -4,11 +4,18 @@
     <div class="section" id="user-section">
         <div id="user-detail">
             <div class="avatar">
-                <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded">
+                @if (Auth::guard('employee')->user()->photo != null)
+                    @php
+                        $path = Storage::url('public/' . Auth::guard('employee')->user()->photo);
+                    @endphp
+                    <img src="{{ $path }}" alt="avatar" class="imaged w64" style="height: 75px;">
+                @else
+                    <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded">
+                @endif
             </div>
             <div id="user-info">
-                <h2 id="user-name">Reza</h2>
-                <span id="user-role">Head of IT</span>
+                <h2 id="user-name">{{ Auth::guard('employee')->user()->fullname }}</h2>
+                <span id="user-role">{{ Auth::guard('employee')->user()->positions }}</span>
             </div>
         </div>
     </div>
@@ -75,14 +82,14 @@
                                                 'public/uploads/attendance/' . $todayAttendance->check_in_photo,
                                             );
                                         @endphp
-                                        <img src="{{ $path }}" alt="image" class="imaged w64">
+                                        <img src="{{ $path }}" alt="image" class="imaged w48">
                                     @else
                                         <ion-icon name="camera"></ion-icon>
                                     @endif
                                 </div>
                                 <div class="presencedetail">
                                     <h4 class="presencetitle">Masuk</h4>
-                                    <span>{{ $todayAttendance != null ? $todayAttendance->check_in_time : 'Belum Melakukan Presensi Masuk' }}</span>
+                                    <span>{{ $todayAttendance != null ? $todayAttendance->check_in_time : '-' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -99,16 +106,74 @@
                                                 'public/uploads/attendance/' . $todayAttendance->check_out_photo,
                                             );
                                         @endphp
-                                        <img src="{{ $path }}" alt="image" class="imaged w64">
+                                        <img src="{{ $path }}" alt="image" class="imaged w48">
                                     @else
                                         <ion-icon name="camera"></ion-icon>
                                     @endif
                                 </div>
                                 <div class="presencedetail">
                                     <h4 class="presencetitle">Pulang</h4>
-                                    <span>{{ $todayAttendance != null && $todayAttendance->check_out_time != null ? $todayAttendance->check_out_time : 'Belum Melakukan Presensi Pulang' }}</span>
+                                    <span>{{ $todayAttendance != null && $todayAttendance->check_out_time != null ? $todayAttendance->check_out_time : '-' }}</span>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="recap">
+            <h3>Rekap Kehadiran {{ $month }} {{ $year }}</h3>
+            <div class="row">
+                <div class="col-3">
+                    <div class="card rounded-2 shadow-sm" style="aspect-ratio: 1 / 1;">
+                        <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                            <span class="badge bg-danger"
+                                style="position: absolute; top: 3px; right: 10px; font-size: 0.6rem; z-index: 999; ">
+                                {{ $recapMonth->total_kehadiran }}
+                            </span>
+                            <ion-icon name="accessibility-outline"
+                                style="text-align: center; font-size: 1.6rem; ! important padding: 18px 12px; line-height: 0.5rem; margin-top: -10px;"
+                                class="text-primary"></ion-icon>
+                            <span style="font-size: 0.8rem; margin-top: 5px ;margin-bottom: -15px">Hadir</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="card rounded-2 shadow-sm" style="aspect-ratio: 1 / 1;">
+                        <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                            <span class="badge bg-danger"
+                                style="position: absolute; top: 3px; right: 10px; font-size: 0.6rem; z-index: 999; ">2</span>
+                            <ion-icon name="newspaper-outline"
+                                style="text-align: center; font-size: 1.6rem; ! important padding: 18px 12px; line-height: 0.5rem; margin-top: -10px;"
+                                class="text-success"></ion-icon>
+                            <span style="font-size: 0.8rem; margin-top: 5px ;margin-bottom: -15px">Cuti</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="card rounded-2 shadow-sm " style="aspect-ratio: 1 / 1;">
+                        <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                            <span class="badge bg-danger"
+                                style="position: absolute; top: 3px; right: 10px; font-size: 0.6rem; z-index: 999; ">2</span>
+                            <ion-icon name="medkit-outline"
+                                style="text-align: center; font-size: 1.6rem; ! important padding: 18px 12px; line-height: 0.5rem; margin-top: -10px;"
+                                class="text-warning"></ion-icon>
+                            <span style="font-size: 0.8rem; margin-top: 5px ;margin-bottom: -15px">Sakit</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="card rounded-2 shadow-sm" style="aspect-ratio: 1 / 1;">
+                        <div class="card-body text-center d-flex flex-column justify-content-center align-items-center">
+                            <span class="badge bg-danger"
+                                style="position: absolute; top: 3px; right: 10px; font-size: 0.6rem; z-index: 999; ">
+                                {{ $recapMonth->total_terlambat }}
+                            </span>
+                            <ion-icon name="alarm-outline"
+                                style="text-align: center; font-size: 1.6rem; ! important padding: 18px 12px; line-height: 0.5rem; margin-top: -10px;"
+                                class="text-danger"></ion-icon>
+                            <span style="font-size: 0.8rem; margin-top: 5px ;margin-bottom: -15px">Telat</span>
                         </div>
                     </div>
                 </div>
@@ -144,76 +209,44 @@
                                         <ion-icon name="finger-print-outline"></ion-icon>
                                     </div>
                                     <div class="in">
-                                        <div>{{ date('d M Y') }} </div>
+                                        <div>{{ date('d M Y') }}</div>
                                         <span class="badge badge-success square ">{{ $d->check_in_time }}</span>
                                         <td style="width: 100%; max-width: 100%; white-space: normal;">
-                                            <span class="badge badge-danger"
-                                                style="
-                                                white-space: normal;
-                                                word-break: break-word;
-                                                display: inline-block;
-                                                width: 100%;
-                                            ">
+                                            <span class="badge badge-danger">
                                                 {{ $todayAttendance != null && $todayAttendance->check_out_time != null
                                                     ? $todayAttendance->check_out_time
-                                                    : 'Belum Melakukan Presensi' }}
+                                                    : 'Belum Presensi' }}
                                             </span>
                                         </td>
-
-
                                     </div>
                                 </div>
                             </li>
                         @endforeach
-
-
                     </ul>
                 </div>
+
                 <div class="tab-pane fade" id="profile" role="tabpanel">
-                    <ul class="listview image-listview">
-                        <li>
-                            <div class="item">
-                                <img src="assets/img/sample/avatar/avatar1.jpg" alt="image" class="image">
-                                <div class="in">
-                                    <div>Edward Lindgren</div>
-                                    <span class="text-muted">Designer</span>
+                    @foreach ($leaderboard as $d)
+                        <ul class="listview image-listview">
+                            <li>
+                                <div class="item">
+                                    <img src="assets/img/sample/avatar/avatar1.jpg" alt="image" class="image">
+                                    <div class="in">
+                                        <div>
+                                            {{ $d->fullname }}
+                                            <p>
+                                                <small class="text-muted"><b>{{ $d->positions }}</b></small>
+                                            </p>
+
+                                        </div>
+                                        <span
+                                            class=" {{ $d->check_in_time < '08:00' ? 'text-muted' : 'text-danger' }}">Jam:
+                                            {{ $d->check_in_time }}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="item">
-                                <img src="assets/img/sample/avatar/avatar1.jpg" alt="image" class="image">
-                                <div class="in">
-                                    <div>Emelda Scandroot</div>
-                                    <span class="badge badge-primary">3</span>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="item">
-                                <img src="assets/img/sample/avatar/avatar1.jpg" alt="image" class="image">
-                                <div class="in">
-                                    <div>Henry Bove</div>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="item">
-                                <img src="assets/img/sample/avatar/avatar1.jpg" alt="image" class="image">
-                                <div class="in">
-                                    <div>Henry Bove</div>
-                                </div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="item">
-                                <img src="assets/img/sample/avatar/avatar1.jpg" alt="image" class="image">
-                                <div class="in">
-                                    <div>Henry Bove</div>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
+                            </li>
+                        </ul>
+                    @endforeach
                 </div>
 
             </div>

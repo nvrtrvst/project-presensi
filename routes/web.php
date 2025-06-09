@@ -30,6 +30,10 @@ Route::middleware(['auth:employee'])->group(function () {
     //Presensi
     Route::get('/attendances/create', [AttendanceController::class, 'create'])->name('attendances.create');
     Route::post('/attendances/store', [AttendanceController::class, 'store'])->name('attendances.store');
+
+    //editprofile
+    Route::get('/editprofile', [AttendanceController::class, 'editProfile'])->name('attendances.editprofile');
+    Route::post('/attendances/{nik}/updateprofile', [AttendanceController::class, 'updateProfile'])->name('attendances.updateprofile');
 });
 
 // Route::view('dashboard', 'dashboard')j

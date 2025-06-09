@@ -6,10 +6,11 @@
             <strong>Home</strong>
         </div>
     </a>
-    <a href="#" class="item {{ Route::is('') ? 'active' : '' }}">
+    <a href="#" class="item {{ Route::is('dashboard') ? '' : '' }}">
         <div class="col">
-            <ion-icon name="calendar-outline" role="img" class="md hydrated" aria-label="calendar outline"></ion-icon>
-            <strong>Calendar</strong>
+            <ion-icon name="document-text-outline" role="img" class="md hydrated"
+                aria-label="document text outline"></ion-icon>
+            <strong>History</strong>
         </div>
     </a>
     <a href="/attendances/create" class="item {{ Route::is('create') ? 'active' : '' }}">
@@ -19,14 +20,15 @@
             </div>
         </div>
     </a>
-    <a href="#" class="item {{ Route::is('dashboard') ? '' : '' }}">
+    <a href="#" class="item {{ Route::is('') ? 'active' : '' }}">
         <div class="col">
-            <ion-icon name="document-text-outline" role="img" class="md hydrated"
-                aria-label="document text outline"></ion-icon>
-            <strong>Docs</strong>
+            <ion-icon name="calendar-outline" role="img" class="md hydrated"
+                aria-label="calendar outline"></ion-icon>
+            <strong>Izin</strong>
         </div>
     </a>
-    <a href="javascript:;" class="item {{ Route::is('') ? 'active' : '' }}">
+
+    <a href="/editprofile" class="item {{ Route::is('') ? 'active' : '' }}">
         <div class="col">
             <ion-icon name="people-outline" role="img" class="md hydrated" aria-label="people outline"></ion-icon>
             <strong>Profile</strong>
